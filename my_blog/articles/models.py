@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
@@ -7,17 +8,17 @@ from core.models import TimeStampedModel
 User = settings.AUTH_USER_MODEL
 
 
+class Tag(models.Model):
+    name = models.CharField(max_length=20, unique=True)
+
+
 class Article(TimeStampedModel):
     title = models.CharField(max_length=50)
     writer = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
     content = models.TextField(_("Text content of Article"))
     is_published = models.BooleanField(default=False)
     liking_users = models.ManyToManyField(User, related_name="likes")
-
-
-class Tag(models.Model):
-    name = models.CharField(max_length=20)
-    used_articles = models.ManyToManyField(Article, related_name="tags")
+    tags = models.ManyToManyField(Tag, related_name="used_articles")
 
 
 class Comment(TimeStampedModel):
