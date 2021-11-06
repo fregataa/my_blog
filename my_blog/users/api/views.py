@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.decorators import action
 from rest_framework.mixins import (
     ListModelMixin,
@@ -30,7 +30,7 @@ class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericV
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
-class UserCreateViewSet(CreateModelMixin, GenericViewSet):
+class UserCreateView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserCreateSerializer
 
@@ -39,15 +39,3 @@ class UserCreateViewSet(CreateModelMixin, GenericViewSet):
         Returns empty permission classes to disable permission to enable user creation.
         """
         return []
-
-    def get(self, _):
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def put(self, _):
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def patch(self, _):
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def delete(self, _):
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
