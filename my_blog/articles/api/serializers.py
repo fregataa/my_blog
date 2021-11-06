@@ -10,18 +10,18 @@ class GenericCommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ["article", "writer", "content"]
+        fields = ["pk", "article", "writer", "content"]
 
 
 class RecommentSerializer(serializers.ModelSerializer):
     article = serializers.HyperlinkedRelatedField(
         read_only=True, view_name="api:article-detail"
     )
-    comments = GenericCommentSerializer(read_only=True)
+    comment = GenericCommentSerializer(read_only=True)
 
     class Meta:
         model = Recomment
-        fields = ["comment", "writer", "content", "article", "comments"]
+        fields = ["pk", "writer", "content", "article", "comment"]
 
 
 class CommentSerializer(GenericCommentSerializer):
@@ -29,7 +29,7 @@ class CommentSerializer(GenericCommentSerializer):
 
     class Meta:
         model = Comment
-        fields = ["article", "writer", "content", "recomments"]
+        fields = ["pk", "article", "writer", "content", "recomments"]
 
 
 class TagSerializer(serializers.ModelSerializer):
