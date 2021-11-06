@@ -8,6 +8,7 @@ from rest_framework.mixins import (
 )
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+from rest_framework.permissions import AllowAny
 
 from .serializers import UserSerializer, UserCreateSerializer
 
@@ -32,9 +33,4 @@ class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericV
 class UserCreateView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserCreateSerializer
-
-    def get_permissions(self):
-        """Instantiates and returns the list of permissions that this view requires.
-        Returns empty permission classes to disable permission to enable user creation.
-        """
-        return []
+    permission_classes = [AllowAny]

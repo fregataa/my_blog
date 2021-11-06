@@ -1,10 +1,16 @@
 from django.db.models import Q
-from rest_framework import status, serializers
+from rest_framework import status, generics, serializers
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 
-from .serializers import ArticleSerializer, CommentSerializer, RecommentSerializer
+from .serializers import (
+    ArticleSerializer,
+    CommentSerializer,
+    RecommentSerializer,
+    TagSerializer,
+)
 from ..models import Article, Comment, Recomment, Tag
 from .permissions import IsWriterOrReadOnly
 
@@ -60,3 +66,9 @@ class RecommentViewSet(ModelViewSet):
         serializer.save(
             comment=Comment.objects.get(id=data["comment"]), writer=self.request.user
         )
+
+
+class TagView(generics.RetrieveAPIView):
+    serializer_class = TagSerializer
+    queryset = Tag.objects.all()
+    permission_classes = [AllowAny]
