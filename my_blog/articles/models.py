@@ -4,16 +4,15 @@ from django.utils.translation import gettext_lazy as _
 
 from core.models import TimeStampedModel
 
+User = settings.AUTH_USER_MODEL
+
 
 class Article(TimeStampedModel):
     title = models.CharField(max_length=50)
-    writer = models.ForeignKey(
-        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL
-    )
+    writer = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
     content = models.TextField(_("Text content of Article"))
-    liking_users = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name="likes"
-    )
+    is_published = models.BooleanField(default=False)
+    liking_users = models.ManyToManyField(User, related_name="likes")
 
 
 class Tag(models.Model):
@@ -26,7 +25,7 @@ class Comment(TimeStampedModel):
         Article, on_delete=models.CASCADE, related_name="comments"
     )
     writer = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        User,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -44,7 +43,7 @@ class Recomment(TimeStampedModel):
         related_name="recomments",
     )
     writer = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        User,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,

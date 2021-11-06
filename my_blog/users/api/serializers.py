@@ -14,16 +14,18 @@ class UserSerializer(serializers.ModelSerializer):
             "url": {"view_name": "api:user-detail", "lookup_field": "username"}
         }
 
+
 class UserCreateSerializer(serializers.ModelSerializer):
+    username = serializers.CharField()
+    email = serializers.EmailField(required=True)
     password = serializers.CharField(
-        write_only=True,
-        style={'input_type': 'password'}
+        write_only=True, required=True, style={"input_type": "password"}
     )
 
     class Meta:
         model = User
-        fields = ["username", "email", "password"]
+        fields = ["username", "password", "email"]
 
     def create(self, validated_data):
-        validated_data['password'] = make_password(validated_data.get('password'))
+        validated_data["password"] = make_password(validated_data.get("password"))
         return super().create(validated_data)
