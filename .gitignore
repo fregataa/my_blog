@@ -72,6 +72,9 @@ ENV/
 # Django env
 .env
 
+# zappa settings
+zappa_settings.json
+
 # Rope project settings
 .ropeproject
 
