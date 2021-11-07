@@ -7,7 +7,7 @@ from my_blog.articles.api.views import (
     ArticleViewSet,
     CommentViewSet,
     RecommentViewSet,
-    TagView,
+    TagViewSet,
 )
 
 if settings.DEBUG:
@@ -19,10 +19,10 @@ router.register("users", UserViewSet)
 router.register("articles", ArticleViewSet)
 router.register("comments", CommentViewSet)
 router.register("recomments", RecommentViewSet)
+router.register("tags", TagViewSet)
 
 
 app_name = "api"
 urlpatterns = router.urls + [
     path("users-create", view=UserCreateView.as_view(), name="usercreate"),
-    path("tags", view=TagView.as_view(), name="tag"),
 ]

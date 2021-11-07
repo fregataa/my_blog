@@ -17,3 +17,12 @@ class IsWriterOrReadOnly(BasePermission):
 
         # Instance must have an attribute named `owner`.
         return obj.writer == request.user
+
+
+class ReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        _ = view
+
+        if request.method in SAFE_METHODS:
+            return True
+        return False

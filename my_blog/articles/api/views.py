@@ -1,4 +1,6 @@
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
+
 from rest_framework import status, generics, serializers
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
@@ -12,7 +14,7 @@ from .serializers import (
     TagSerializer,
 )
 from ..models import Article, Comment, Recomment, Tag
-from .permissions import IsWriterOrReadOnly
+from .permissions import IsWriterOrReadOnly, ReadOnly
 
 
 class ArticleViewSet(ModelViewSet):
@@ -68,7 +70,18 @@ class RecommentViewSet(ModelViewSet):
         )
 
 
-class TagView(generics.RetrieveAPIView):
+class TagViewSet(ModelViewSet):
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [ReadOnly]
+
+    def list(self, request):
+        serializer = TagSerializer(
+            self.queryset, context={"request": request}, many=True
+        )
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        tag = get_object_or_404(self.queryset, pk=pk)
+        serializer = TagSerializer(tag, context={"request": request})
+        return Response(serializer.data)
