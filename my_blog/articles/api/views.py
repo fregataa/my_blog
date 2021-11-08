@@ -38,8 +38,14 @@ class ArticleViewSet(ModelViewSet):
 
     @action(detail=True, methods=["PATCH"])
     def publish(self, request, pk):
+        """Patches is_published field to True.
+        Do nothing if the article has already been published.
+        """
+
         _ = request
         article = self.queryset.get(pk=pk)
+        if article.is_published:
+            return Response(status=status.HTTP_204_NO_CONTENT)
         article.is_published = True
         article.save(update_fields=["is_published"])
         return Response(status=status.HTTP_204_NO_CONTENT)
