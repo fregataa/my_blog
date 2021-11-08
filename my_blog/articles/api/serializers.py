@@ -40,21 +40,26 @@ article_serializer_fields = [
     "writer",
     "content",
     "is_published",
-    "liking_users",
-    "comments",
     "url",
 ]
 
 
 class GenericArticleSerializer(serializers.ModelSerializer):
-    comments = CommentSerializer(many=True, read_only=True)
-
     class Meta:
         model = Article
         fields = article_serializer_fields
         read_only_fields = ["pk", "liking_users"]
 
         extra_kwargs = {"url": {"view_name": "api:article-detail"}}
+
+    def to_representation(self, instance):
+        """Since this serializer is used by TagSerializer,
+        articles not published should not be returned.
+        """
+
+        if not instance.is_published:
+            return None
+        return super().to_representation(instance)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -71,7 +76,7 @@ class ArticleSerializer(GenericArticleSerializer):
 
     class Meta:
         model = Article
-        fields = [*article_serializer_fields, "tags"]
+        fields = [*article_serializer_fields, "tags", "comments", "liking_users"]
         read_only_fields = ["pk", "liking_users"]
 
         extra_kwargs = {"url": {"view_name": "api:article-detail"}}
