@@ -52,6 +52,8 @@ class GenericArticleSerializer(serializers.ModelSerializer):
 
         extra_kwargs = {"url": {"view_name": "api:article-detail"}}
 
+
+class TinyArticleSerializer(GenericArticleSerializer):
     def to_representation(self, instance):
         """Since this serializer is used by TagSerializer,
         articles not published should not be returned.
@@ -63,7 +65,7 @@ class GenericArticleSerializer(serializers.ModelSerializer):
 
 
 class TagSerializer(serializers.ModelSerializer):
-    used_articles = GenericArticleSerializer(many=True, read_only=True)
+    used_articles = TinyArticleSerializer(many=True, read_only=True)
 
     class Meta:
         model = Tag
