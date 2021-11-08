@@ -3,20 +3,22 @@ from rest_framework import serializers
 from users.api.serializers import UserSerializer
 from ..models import Article, Comment, Recomment, Tag
 
-comment_serializer_fields = ["pk", "article", "writer", "content"]
+comment_serializer_fields = ["pk", "writer", "content"]
+
+
+class GenericRecommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recomment
+        fields = comment_serializer_fields
 
 
 class GenericCommentSerializer(serializers.ModelSerializer):
-    article = serializers.HyperlinkedRelatedField(
-        read_only=True, view_name="api:article-detail"
-    )
-
     class Meta:
         model = Comment
         fields = comment_serializer_fields
 
 
-class RecommentSerializer(serializers.ModelSerializer):
+class RecommentSerializer(GenericRecommentSerializer):
     article = serializers.HyperlinkedRelatedField(
         read_only=True, view_name="api:article-detail"
     )
@@ -24,15 +26,18 @@ class RecommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recomment
-        fields = [*comment_serializer_fields, "comment"]
+        fields = [*comment_serializer_fields, "article", "comment"]
 
 
 class CommentSerializer(GenericCommentSerializer):
-    recomments = RecommentSerializer(many=True, read_only=True)
+    article = serializers.HyperlinkedRelatedField(
+        read_only=True, view_name="api:article-detail"
+    )
+    recomments = GenericRecommentSerializer(many=True, read_only=True)
 
     class Meta:
         model = Comment
-        fields = ["pk", "article", "writer", "content", "recomments"]
+        fields = [*comment_serializer_fields, "article", "recomments"]
 
 
 article_serializer_fields = [
@@ -49,7 +54,7 @@ class GenericArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = article_serializer_fields
-        read_only_fields = ["pk", "liking_users"]
+        read_only_fields = ["liking_users"]
 
         extra_kwargs = {"url": {"view_name": "api:article-detail"}}
 
@@ -81,6 +86,5 @@ class ArticleSerializer(GenericArticleSerializer):
     class Meta:
         model = Article
         fields = [*article_serializer_fields, "tags", "comments", "liking_users"]
-        read_only_fields = ["pk"]
 
         extra_kwargs = {"url": {"view_name": "api:article-detail"}}
