@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from users.api.serializers import UserSerializer
 from ..models import Article, Comment, Recomment, Tag
 
 comment_serializer_fields = ["pk", "article", "writer", "content"]
@@ -75,10 +76,11 @@ class TagSerializer(serializers.ModelSerializer):
 class ArticleSerializer(GenericArticleSerializer):
     tags = TagSerializer(many=True, read_only=True)
     comments = CommentSerializer(many=True, read_only=True)
+    liking_users = UserSerializer(many=True, read_only=True)
 
     class Meta:
         model = Article
         fields = [*article_serializer_fields, "tags", "comments", "liking_users"]
-        read_only_fields = ["pk", "liking_users"]
+        read_only_fields = ["pk"]
 
         extra_kwargs = {"url": {"view_name": "api:article-detail"}}

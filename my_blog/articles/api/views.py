@@ -40,6 +40,15 @@ class ArticleViewSet(ModelViewSet):
         article.save(update_fields=["is_published"])
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @action(detail=True, methods=["PUT"])
+    def like(self, request, pk):
+        if not request.user.is_authenticated:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        article = self.queryset.get(pk=pk)
+        article.liking_users.add(request.user)
+        serializer = ArticleSerializer(article, context={"request": request})
+        return Response(status=status.HTTP_201_CREATED, data=serializer.data)
+
 
 class CommentViewSet(ModelViewSet):
     serializer_class = CommentSerializer
