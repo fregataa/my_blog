@@ -22,15 +22,19 @@ class ArticleViewSet(ModelViewSet):
     permission_classes = [IsWriterOrReadOnly]
 
     def get_queryset(self):
+        """Returns user's articles or all published articles."""
+
         return self.queryset.filter(Q(writer=self.request.user) | Q(is_published=True))
 
     def perform_create(self, serializer):
+        """Patches writer field and tags field of created article."""
+
+        article = serializer.save(writer=self.request.user)
         tags = self.request.data.get("tags")
         tag_list = []
         if tags is not None and len(tags) > 0:
             tag_list = [Tag.objects.get_or_create(name=tag)[0] for tag in tags]
-        article = serializer.save(writer=self.request.user)
-        article.tags.add(*tag_list)
+            article.tags.add(*tag_list)
 
     @action(detail=True, methods=["PATCH"])
     def publish(self, request, pk):
@@ -42,6 +46,10 @@ class ArticleViewSet(ModelViewSet):
 
     @action(detail=True, methods=["PUT"])
     def like(self, request, pk):
+        """Adds like field of article.
+        Only authenticated users can ``like`` any articles.
+        """
+
         if not request.user.is_authenticated:
             return Response(status=status.HTTP_403_FORBIDDEN)
         article = self.queryset.get(pk=pk)
@@ -56,6 +64,8 @@ class CommentViewSet(ModelViewSet):
     permission_classes = [IsWriterOrReadOnly]
 
     def perform_create(self, serializer):
+        """Patches article field of created comment."""
+
         data = self.request.data
         if "article" not in data:
             raise serializers.ValidationError("`article` field is required.")
@@ -70,6 +80,8 @@ class RecommentViewSet(ModelViewSet):
     permission_classes = [IsWriterOrReadOnly]
 
     def perform_create(self, serializer):
+        """Patches comment field of created recomment."""
+
         data = self.request.data
         if "comment" not in data:
             raise serializers.ValidationError("`comment` field is required.")
